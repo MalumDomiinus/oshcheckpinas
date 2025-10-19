@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Shield } from "lucide-react";
+import { Loader2, Shield, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Auth = () => {
@@ -72,9 +72,15 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold">
+          <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold mb-4">
             <Shield className="h-8 w-8 text-accent" />
             <span>CertifyCheck</span>
+          </Link>
+          <Link to="/">
+            <Button variant="ghost" className="mt-2">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
           </Link>
         </div>
 
