@@ -72,15 +72,9 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold mb-4">
+          <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold">
             <Shield className="h-8 w-8 text-accent" />
             <span>CertifyCheck</span>
-          </Link>
-          <Link to="/">
-            <Button variant="ghost" className="mt-2">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
-            </Button>
           </Link>
         </div>
 
@@ -164,6 +158,15 @@ const Auth = () => {
             </form>
           </CardContent>
         </Card>
+        
+        <div className="text-center mt-6">
+          <Link to="/">
+            <Button variant="ghost">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );
