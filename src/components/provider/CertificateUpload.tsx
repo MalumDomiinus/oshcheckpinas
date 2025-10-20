@@ -158,7 +158,7 @@ export const CertificateUpload = ({ providerId, onUploadComplete }: CertificateU
       >
         {uploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         <Upload className="mr-2 h-4 w-4" />
-        Upload Certificates
+        Upload File
       </Button>
     </div>
   );
