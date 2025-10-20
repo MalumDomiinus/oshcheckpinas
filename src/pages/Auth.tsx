@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Shield, ArrowLeft } from "lucide-react";
@@ -16,13 +17,27 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [isProvider, setIsProvider] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate('/admin');
+        // Check user role and redirect accordingly
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (roleData?.role === 'provider') {
+          navigate('/provider');
+        } else if (roleData?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       }
     };
     checkUser();
@@ -34,15 +49,29 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error, data } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
         if (error) throw error;
         
+        // Check user role and redirect accordingly
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', data.user?.id)
+          .single();
+        
         toast.success("Signed in successfully!");
-        navigate('/admin');
+        
+        if (roleData?.role === 'provider') {
+          navigate('/provider');
+        } else if (roleData?.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -50,6 +79,7 @@ const Auth = () => {
           options: {
             data: {
               full_name: fullName,
+              role: isProvider ? 'provider' : 'user',
             },
             emailRedirectTo: `${window.location.origin}/`,
           },
@@ -86,23 +116,42 @@ const Auth = () => {
             <CardDescription>
               {isLogin 
                 ? 'Sign in to access your dashboard' 
-                : 'Register to manage certificates'}
+                : isProvider
+                  ? 'Register to manage your training certificates'
+                  : 'Register to verify certificates'}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
-                <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
-                  <Input
-                    id="fullName"
-                    placeholder="Enter your full name"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required={!isLogin}
-                    disabled={isLoading}
-                  />
-                </div>
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      placeholder="Enter your full name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required={!isLogin}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isProvider"
+                      checked={isProvider}
+                      onCheckedChange={(checked) => setIsProvider(checked as boolean)}
+                      disabled={isLoading}
+                    />
+                    <Label 
+                      htmlFor="isProvider" 
+                      className="text-sm font-normal cursor-pointer"
+                    >
+                      I am a training provider
+                    </Label>
+                  </div>
+                </>
               )}
 
               <div className="space-y-2">
