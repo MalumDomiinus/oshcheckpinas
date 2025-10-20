@@ -25,6 +25,7 @@ export type Database = {
           issue_date: string
           last_name: string
           metadata: Json | null
+          provider_id: string | null
           provider_name: string
           status: Database["public"]["Enums"]["certificate_status"]
           updated_at: string
@@ -39,6 +40,7 @@ export type Database = {
           issue_date: string
           last_name: string
           metadata?: Json | null
+          provider_id?: string | null
           provider_name: string
           status?: Database["public"]["Enums"]["certificate_status"]
           updated_at?: string
@@ -53,11 +55,20 @@ export type Database = {
           issue_date?: string
           last_name?: string
           metadata?: Json | null
+          provider_id?: string | null
           provider_name?: string
           status?: Database["public"]["Enums"]["certificate_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "certificates_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -80,6 +91,39 @@ export type Database = {
           full_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      providers: {
+        Row: {
+          accreditation_expiration: string
+          accreditation_number: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accreditation_expiration: string
+          accreditation_number: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accreditation_expiration?: string
+          accreditation_number?: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -170,7 +214,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "provider"
       certificate_status: "active" | "expired" | "revoked"
     }
     CompositeTypes: {
@@ -299,7 +343,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "provider"],
       certificate_status: ["active", "expired", "revoked"],
     },
   },

@@ -8,18 +8,37 @@ import { User } from "@supabase/supabase-js";
 export const Header = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        checkUserRole(session.user.id);
+      } else {
+        setUserRole(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const checkUserRole = async (userId: string) => {
+    const { data } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', userId)
+      .single();
+    
+    setUserRole(data?.role || null);
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -51,7 +70,9 @@ export const Header = () => {
             {user ? (
               <>
                 <Button variant="ghost" asChild>
-                  <Link to="/admin">Dashboard</Link>
+                  <Link to={userRole === 'provider' ? '/provider' : '/admin'}>
+                    Dashboard
+                  </Link>
                 </Button>
                 <Button variant="outline" onClick={handleSignOut}>
                   Sign Out
