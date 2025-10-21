@@ -1,10 +1,8 @@
 import { Header } from "@/components/Header";
 import { VerificationForm } from "@/components/VerificationForm";
 import { Shield, Lock, Clock, CheckCircle } from "lucide-react";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-gradient-hero">
+  return <div className="min-h-screen bg-gradient-hero">
       <Header />
       
       <main className="container mx-auto px-4 py-12">
@@ -12,9 +10,7 @@ const Index = () => {
           <div className="inline-flex items-center gap-2 mb-4">
             <Shield className="h-12 w-12 text-accent" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Verify Certificates Instantly
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Verify your OSH Certificates Instantly!</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Fast, secure, and reliable certificate verification system. Check the authenticity of any certificate in seconds.
           </p>
@@ -62,8 +58,6 @@ const Index = () => {
           </div>
         </section>
       </main>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
