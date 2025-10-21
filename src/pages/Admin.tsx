@@ -23,6 +23,19 @@ const Admin = () => {
         return;
       }
       
+      // Verify admin role
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .eq('role', 'admin')
+        .single();
+      
+      if (!roleData) {
+        navigate('/');
+        return;
+      }
+      
       await loadStats();
       setIsLoading(false);
     };
