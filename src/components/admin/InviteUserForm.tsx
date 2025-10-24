@@ -13,7 +13,7 @@ import { Mail, UserPlus, Loader2 } from "lucide-react";
 
 const inviteSchema = z.object({
   email: z.string().email("Invalid email address").max(255, "Email must be less than 255 characters"),
-  role: z.enum(["user", "moderator"], { required_error: "Please select a role" }),
+  role: z.enum(["user", "provider", "admin"], { required_error: "Please select a role" }),
   fullName: z.string().trim().max(100, "Name must be less than 100 characters").optional(),
 });
 
@@ -108,14 +108,15 @@ export const InviteUserForm = () => {
             <Label htmlFor="role">Role *</Label>
             <Select
               value={selectedRole}
-              onValueChange={(value) => setValue("role", value as "user" | "moderator")}
+              onValueChange={(value) => setValue("role", value as "user" | "provider" | "admin")}
             >
               <SelectTrigger id="role">
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="user">User</SelectItem>
-                <SelectItem value="moderator">Moderator</SelectItem>
+                <SelectItem value="provider">Provider</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
               </SelectContent>
             </Select>
             {errors.role && (
