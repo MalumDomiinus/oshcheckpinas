@@ -5,6 +5,7 @@ import { Header } from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, FileCheck, Users, Activity } from "lucide-react";
+import { InviteUserForm } from "@/components/admin/InviteUserForm";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -122,12 +123,16 @@ const Admin = () => {
             <CardDescription>Manage your certificate system</CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="certificates" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+            <Tabs defaultValue="users" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="users">User Management</TabsTrigger>
                 <TabsTrigger value="certificates">Certificates</TabsTrigger>
                 <TabsTrigger value="logs">Verification Logs</TabsTrigger>
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
+              <TabsContent value="users" className="mt-6">
+                <InviteUserForm />
+              </TabsContent>
               <TabsContent value="certificates" className="mt-6">
                 <p className="text-muted-foreground text-center py-12">
                   Certificate management interface coming soon
