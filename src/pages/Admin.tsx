@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, FileCheck, Users, Activity } from "lucide-react";
 import { InviteUserForm } from "@/components/admin/InviteUserForm";
+import { UserManagementTable } from "@/components/admin/UserManagementTable";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -131,7 +132,13 @@ const Admin = () => {
                 <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
               <TabsContent value="users" className="mt-6">
-                <InviteUserForm />
+                <div className="space-y-6">
+                  <InviteUserForm />
+                  <div>
+                    <h3 className="text-lg font-semibold mb-4">All Users</h3>
+                    <UserManagementTable />
+                  </div>
+                </div>
               </TabsContent>
               <TabsContent value="certificates" className="mt-6">
                 <p className="text-muted-foreground text-center py-12">
