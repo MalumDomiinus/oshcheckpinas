@@ -65,9 +65,21 @@ export const Header = () => {
 
           <div className="flex items-center gap-2">
             {user ? <>
-                <Button variant="ghost" asChild>
-                  
-                </Button>
+                {userRole === 'admin' && (
+                  <Button variant="ghost" asChild>
+                    <Link to="/admin">Admin Dashboard</Link>
+                  </Button>
+                )}
+                {userRole === 'provider' && (
+                  <Button variant="ghost" asChild>
+                    <Link to="/provider">Provider Dashboard</Link>
+                  </Button>
+                )}
+                {userRole === 'user' && (
+                  <Button variant="ghost" asChild>
+                    <Link to="/dashboard">My Dashboard</Link>
+                  </Button>
+                )}
                 <Button variant="outline" onClick={handleSignOut}>
                   Sign Out
                 </Button>

@@ -74,22 +74,37 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          first_name: string | null
           full_name: string | null
           id: string
+          job_title: string | null
+          last_name: string | null
+          professional_accreditation: string | null
+          profile_picture_url: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           email: string
+          first_name?: string | null
           full_name?: string | null
           id: string
+          job_title?: string | null
+          last_name?: string | null
+          professional_accreditation?: string | null
+          profile_picture_url?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           email?: string
+          first_name?: string | null
           full_name?: string | null
           id?: string
+          job_title?: string | null
+          last_name?: string | null
+          professional_accreditation?: string | null
+          profile_picture_url?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -156,6 +171,78 @@ export type Database = {
           },
         ]
       }
+      user_trainings_attended: {
+        Row: {
+          certificate_url: string | null
+          conducted_by: string
+          created_at: string
+          date_completed: string
+          hours: number
+          id: string
+          training_name: string
+          updated_at: string
+          user_id: string
+          venue: string
+        }
+        Insert: {
+          certificate_url?: string | null
+          conducted_by: string
+          created_at?: string
+          date_completed: string
+          hours: number
+          id?: string
+          training_name: string
+          updated_at?: string
+          user_id: string
+          venue: string
+        }
+        Update: {
+          certificate_url?: string | null
+          conducted_by?: string
+          created_at?: string
+          date_completed?: string
+          hours?: number
+          id?: string
+          training_name?: string
+          updated_at?: string
+          user_id?: string
+          venue?: string
+        }
+        Relationships: []
+      }
+      user_trainings_conducted: {
+        Row: {
+          created_at: string
+          date_conducted: string
+          hours: number
+          id: string
+          training_name: string
+          updated_at: string
+          user_id: string
+          venue: string
+        }
+        Insert: {
+          created_at?: string
+          date_conducted: string
+          hours: number
+          id?: string
+          training_name: string
+          updated_at?: string
+          user_id: string
+          venue: string
+        }
+        Update: {
+          created_at?: string
+          date_conducted?: string
+          hours?: number
+          id?: string
+          training_name?: string
+          updated_at?: string
+          user_id?: string
+          venue?: string
+        }
+        Relationships: []
+      }
       verification_logs: {
         Row: {
           certificate_id: string | null
@@ -199,6 +286,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      work_experience: {
+        Row: {
+          appointment_type: string
+          created_at: string
+          from_date: string
+          id: string
+          is_present: boolean | null
+          organization: string
+          position: string
+          to_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_type: string
+          created_at?: string
+          from_date: string
+          id?: string
+          is_present?: boolean | null
+          organization: string
+          position: string
+          to_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_type?: string
+          created_at?: string
+          from_date?: string
+          id?: string
+          is_present?: boolean | null
+          organization?: string
+          position?: string
+          to_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
