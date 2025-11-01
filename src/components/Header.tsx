@@ -4,21 +4,26 @@ import { Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
-
 export const Header = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({
+      data: {
+        session
+      }
+    }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         checkUserRole(session.user.id);
       }
     });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+    const {
+      data: {
+        subscription
+      }
+    } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         checkUserRole(session.user.id);
@@ -26,27 +31,19 @@ export const Header = () => {
         setUserRole(null);
       }
     });
-
     return () => subscription.unsubscribe();
   }, []);
-
   const checkUserRole = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_roles')
-      .select('role')
-      .eq('user_id', userId)
-      .single();
-    
+    const {
+      data
+    } = await supabase.from('user_roles').select('role').eq('user_id', userId).single();
     setUserRole(data?.role || null);
   };
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
   };
-
-  return (
-    <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+  return <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
@@ -67,30 +64,23 @@ export const Header = () => {
           </nav>
 
           <div className="flex items-center gap-2">
-            {user ? (
-              <>
+            {user ? <>
                 <Button variant="ghost" asChild>
-                  <Link to={userRole === 'provider' ? '/provider' : '/admin'}>
-                    Dashboard
-                  </Link>
+                  
                 </Button>
                 <Button variant="outline" onClick={handleSignOut}>
                   Sign Out
                 </Button>
-              </>
-            ) : (
-              <>
+              </> : <>
                 <Button variant="ghost" asChild>
                   <Link to="/auth">Login</Link>
                 </Button>
                 <Button asChild>
                   <Link to="/auth?mode=signup">Register</Link>
                 </Button>
-              </>
-            )}
+              </>}
           </div>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
