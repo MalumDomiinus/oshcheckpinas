@@ -28,6 +28,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
     venue: '',
     date_completed: new Date(),
     hours: '',
+    certificate_number: '',
   });
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
         venue: formData.venue,
         date_completed: format(formData.date_completed, 'yyyy-MM-dd'),
         hours: Number(formData.hours),
+        certificate_number: formData.certificate_number,
       });
 
     if (error) {
@@ -70,6 +72,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
         venue: '',
         date_completed: new Date(),
         hours: '',
+        certificate_number: '',
       });
       loadTrainings();
     }
@@ -140,6 +143,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
             <TableHead>Venue</TableHead>
             <TableHead>Date Completed</TableHead>
             <TableHead>Hours</TableHead>
+            <TableHead>Certificate No.</TableHead>
             <TableHead>Certificate</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -152,6 +156,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
               <TableCell>{training.venue}</TableCell>
               <TableCell>{format(new Date(training.date_completed), 'PP')}</TableCell>
               <TableCell>{training.hours}</TableCell>
+              <TableCell>{training.certificate_number || '-'}</TableCell>
               <TableCell>
                 {training.certificate_url ? (
                   <Button
@@ -196,7 +201,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
           ))}
           {trainings.length === 0 && (
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground">
+              <TableCell colSpan={8} className="text-center text-muted-foreground">
                 No trainings found. Add your first training to get started.
               </TableCell>
             </TableRow>
@@ -266,6 +271,15 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
                 type="number"
                 value={formData.hours}
                 onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Certificate Number</Label>
+              <Input
+                value={formData.certificate_number}
+                onChange={(e) => setFormData({ ...formData, certificate_number: e.target.value })}
+                placeholder="Optional"
               />
             </div>
 

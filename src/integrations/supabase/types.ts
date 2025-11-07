@@ -173,6 +173,7 @@ export type Database = {
       }
       user_trainings_attended: {
         Row: {
+          certificate_number: string | null
           certificate_url: string | null
           conducted_by: string
           created_at: string
@@ -185,6 +186,7 @@ export type Database = {
           venue: string
         }
         Insert: {
+          certificate_number?: string | null
           certificate_url?: string | null
           conducted_by: string
           created_at?: string
@@ -197,6 +199,7 @@ export type Database = {
           venue: string
         }
         Update: {
+          certificate_number?: string | null
           certificate_url?: string | null
           conducted_by?: string
           created_at?: string
