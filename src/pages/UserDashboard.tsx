@@ -10,6 +10,7 @@ import { MetricsCards } from "@/components/user/MetricsCards";
 import { TrainingsAttendedTable } from "@/components/user/TrainingsAttendedTable";
 import { TrainingsConductedTable } from "@/components/user/TrainingsConductedTable";
 import { AIChatAssistant } from "@/components/user/AIChatAssistant";
+import { WorkExperienceList } from "@/components/user/WorkExperienceList";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function UserDashboard() {
@@ -94,6 +95,19 @@ export default function UserDashboard() {
           userId={profile?.id} 
           showResourceSpeaker={showResourceSpeaker}
         />
+
+        {/* Work Experience */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Work Experience</CardTitle>
+            <CardDescription>
+              Your professional work history
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <WorkExperienceList userId={profile?.id} />
+          </CardContent>
+        </Card>
 
         {/* Trainings Attended */}
         <Card className="mb-8">

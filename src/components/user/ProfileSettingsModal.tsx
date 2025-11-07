@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Upload, Plus, Trash2 } from "lucide-react";
-import { WorkExperienceList } from "./WorkExperienceList";
 
 interface ProfileSettingsModalProps {
   open: boolean;
@@ -178,12 +177,7 @@ export function ProfileSettingsModal({ open, onOpenChange, profile, onUpdate }: 
                 <SelectItem value="OSH Practitioner">OSH Practitioner</SelectItem>
                 <SelectItem value="OSH Consultant">OSH Consultant</SelectItem>
               </SelectContent>
-            </Select>
-          </div>
-
-          {/* Work Experience Section */}
-          <div className="border-t pt-6">
-            <WorkExperienceList userId={profile?.id} />
+          </Select>
           </div>
 
           <div className="flex justify-end gap-2">
