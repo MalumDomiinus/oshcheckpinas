@@ -8,11 +8,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Download, Upload, Plus, Trash2 } from "lucide-react";
+import { Download, Upload, Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface TrainingsAttendedTableProps {
   userId: string;
@@ -22,6 +23,9 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
   const [trainings, setTrainings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const [verificationResults, setVerificationResults] = useState<Record<string, any>>({});
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [formData, setFormData] = useState({
     training_name: '',
     conducted_by: '',
@@ -33,7 +37,20 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
 
   useEffect(() => {
     loadTrainings();
+    loadUserProfile();
   }, [userId]);
+
+  const loadUserProfile = async () => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('first_name, last_name')
+      .eq('id', userId)
+      .single();
+    
+    if (data) {
+      setUserProfile(data);
+    }
+  };
 
   const loadTrainings = async () => {
     const { data, error } = await supabase
@@ -122,6 +139,48 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
     }
   };
 
+  const handleVerify = async (training: any) => {
+    if (!training.certificate_number) {
+      toast.error('No certificate number to verify');
+      return;
+    }
+
+    if (!userProfile?.first_name || !userProfile?.last_name) {
+      toast.error('User profile incomplete');
+      return;
+    }
+
+    setVerifyingId(training.id);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-certificate', {
+        body: {
+          firstName: userProfile.first_name,
+          lastName: userProfile.last_name,
+          certificateNumber: training.certificate_number,
+        },
+      });
+
+      if (error) throw error;
+
+      setVerificationResults({
+        ...verificationResults,
+        [training.id]: data,
+      });
+
+      if (data.success) {
+        toast.success('Certificate verified successfully!');
+      } else {
+        toast.error('Certificate not found in database');
+      }
+    } catch (error) {
+      console.error('Verification error:', error);
+      toast.error('Failed to verify certificate');
+    } finally {
+      setVerifyingId(null);
+    }
+  };
+
   if (loading) {
     return <Skeleton className="h-64 w-full" />;
   }
@@ -145,6 +204,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
             <TableHead>Hours</TableHead>
             <TableHead>Certificate No.</TableHead>
             <TableHead>Certificate</TableHead>
+            <TableHead>Verification</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -189,6 +249,30 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
                 )}
               </TableCell>
               <TableCell>
+                {verificationResults[training.id] ? (
+                  verificationResults[training.id].success ? (
+                    <Badge variant="default" className="gap-1">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Verified
+                    </Badge>
+                  ) : (
+                    <Badge variant="destructive" className="gap-1">
+                      <XCircle className="h-3 w-3" />
+                      Not Found
+                    </Badge>
+                  )
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleVerify(training)}
+                    disabled={!training.certificate_number || verifyingId === training.id}
+                  >
+                    {verifyingId === training.id ? 'Verifying...' : 'Verify'}
+                  </Button>
+                )}
+              </TableCell>
+              <TableCell>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -201,7 +285,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
           ))}
           {trainings.length === 0 && (
             <TableRow>
-              <TableCell colSpan={8} className="text-center text-muted-foreground">
+              <TableCell colSpan={9} className="text-center text-muted-foreground">
                 No trainings found. Add your first training to get started.
               </TableCell>
             </TableRow>
