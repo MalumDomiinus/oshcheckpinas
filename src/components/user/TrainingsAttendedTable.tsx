@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Download, Upload, Plus, Trash2, CheckCircle2 } from "lucide-react";
+import { Download, Upload, Plus, Trash2, CheckCircle2, Pencil } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
@@ -23,6 +23,7 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
   const [trainings, setTrainings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingTraining, setEditingTraining] = useState<any>(null);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [formData, setFormData] = useState({
@@ -92,6 +93,48 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
       });
       loadTrainings();
     }
+  };
+
+  const handleEdit = async () => {
+    const { error } = await supabase
+      .from('user_trainings_attended')
+      .update({
+        training_name: formData.training_name,
+        conducted_by: formData.conducted_by,
+        venue: formData.venue,
+        date_completed: format(formData.date_completed, 'yyyy-MM-dd'),
+        hours: Number(formData.hours),
+        certificate_number: formData.certificate_number,
+      })
+      .eq('id', editingTraining.id);
+
+    if (error) {
+      toast.error('Failed to update training');
+    } else {
+      toast.success('Training updated successfully');
+      setEditingTraining(null);
+      setFormData({
+        training_name: '',
+        conducted_by: '',
+        venue: '',
+        date_completed: new Date(),
+        hours: '',
+        certificate_number: '',
+      });
+      loadTrainings();
+    }
+  };
+
+  const openEditDialog = (training: any) => {
+    setEditingTraining(training);
+    setFormData({
+      training_name: training.training_name,
+      conducted_by: training.conducted_by,
+      venue: training.venue,
+      date_completed: new Date(training.date_completed),
+      hours: training.hours.toString(),
+      certificate_number: training.certificate_number || '',
+    });
   };
 
   const handleCertificateUpload = async (trainingId: string, file: File) => {
@@ -271,13 +314,22 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
                 )}
               </TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(training.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openEditDialog(training)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(training.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -291,13 +343,26 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
         </TableBody>
       </Table>
 
-      {/* Add Training Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      {/* Add/Edit Training Dialog */}
+      <Dialog open={showAddDialog || !!editingTraining} onOpenChange={(open) => {
+        if (!open) {
+          setShowAddDialog(false);
+          setEditingTraining(null);
+          setFormData({
+            training_name: '',
+            conducted_by: '',
+            venue: '',
+            date_completed: new Date(),
+            hours: '',
+            certificate_number: '',
+          });
+        }
+      }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Training Attended</DialogTitle>
+            <DialogTitle>{editingTraining ? 'Edit Training Attended' : 'Add Training Attended'}</DialogTitle>
             <DialogDescription>
-              Add a new training to your attendance record
+              {editingTraining ? 'Update the training details' : 'Add a new training to your attendance record'}
             </DialogDescription>
           </DialogHeader>
 
@@ -366,8 +431,21 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
             </div>
 
             <div className="flex gap-2">
-              <Button onClick={handleAdd}>Add Training</Button>
-              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+              <Button onClick={editingTraining ? handleEdit : handleAdd}>
+                {editingTraining ? 'Update Training' : 'Add Training'}
+              </Button>
+              <Button variant="outline" onClick={() => {
+                setShowAddDialog(false);
+                setEditingTraining(null);
+                setFormData({
+                  training_name: '',
+                  conducted_by: '',
+                  venue: '',
+                  date_completed: new Date(),
+                  hours: '',
+                  certificate_number: '',
+                });
+              }}>
                 Cancel
               </Button>
             </div>

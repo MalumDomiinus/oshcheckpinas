@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Plus, Trash2, CalendarIcon } from "lucide-react";
+import { Plus, Trash2, CalendarIcon, Pencil } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ export function TrainingsConductedTable({ userId }: TrainingsConductedTableProps
   const [trainings, setTrainings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [editingTraining, setEditingTraining] = useState<any>(null);
   const [formData, setFormData] = useState({
     training_name: '',
     venue: '',
@@ -71,6 +72,42 @@ export function TrainingsConductedTable({ userId }: TrainingsConductedTableProps
     }
   };
 
+  const handleEdit = async () => {
+    const { error } = await supabase
+      .from('user_trainings_conducted')
+      .update({
+        training_name: formData.training_name,
+        venue: formData.venue,
+        date_conducted: format(formData.date_conducted, 'yyyy-MM-dd'),
+        hours: Number(formData.hours),
+      })
+      .eq('id', editingTraining.id);
+
+    if (error) {
+      toast.error('Failed to update training');
+    } else {
+      toast.success('Training updated successfully');
+      setEditingTraining(null);
+      setFormData({
+        training_name: '',
+        venue: '',
+        date_conducted: new Date(),
+        hours: '',
+      });
+      loadTrainings();
+    }
+  };
+
+  const openEditDialog = (training: any) => {
+    setEditingTraining(training);
+    setFormData({
+      training_name: training.training_name,
+      venue: training.venue,
+      date_conducted: new Date(training.date_conducted),
+      hours: training.hours.toString(),
+    });
+  };
+
   const handleDelete = async (id: string) => {
     const { error } = await supabase
       .from('user_trainings_conducted')
@@ -116,13 +153,22 @@ export function TrainingsConductedTable({ userId }: TrainingsConductedTableProps
               <TableCell>{format(new Date(training.date_conducted), 'PP')}</TableCell>
               <TableCell>{training.hours}</TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(training.id)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openEditDialog(training)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(training.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
@@ -136,13 +182,24 @@ export function TrainingsConductedTable({ userId }: TrainingsConductedTableProps
         </TableBody>
       </Table>
 
-      {/* Add Training Dialog */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      {/* Add/Edit Training Dialog */}
+      <Dialog open={showAddDialog || !!editingTraining} onOpenChange={(open) => {
+        if (!open) {
+          setShowAddDialog(false);
+          setEditingTraining(null);
+          setFormData({
+            training_name: '',
+            venue: '',
+            date_conducted: new Date(),
+            hours: '',
+          });
+        }
+      }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Training Conducted</DialogTitle>
+            <DialogTitle>{editingTraining ? 'Edit Training Conducted' : 'Add Training Conducted'}</DialogTitle>
             <DialogDescription>
-              Add a new training you conducted as a resource speaker
+              {editingTraining ? 'Update the training details' : 'Add a new training you conducted as a resource speaker'}
             </DialogDescription>
           </DialogHeader>
 
@@ -194,8 +251,19 @@ export function TrainingsConductedTable({ userId }: TrainingsConductedTableProps
             </div>
 
             <div className="flex gap-2">
-              <Button onClick={handleAdd}>Add Training</Button>
-              <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+              <Button onClick={editingTraining ? handleEdit : handleAdd}>
+                {editingTraining ? 'Update Training' : 'Add Training'}
+              </Button>
+              <Button variant="outline" onClick={() => {
+                setShowAddDialog(false);
+                setEditingTraining(null);
+                setFormData({
+                  training_name: '',
+                  venue: '',
+                  date_conducted: new Date(),
+                  hours: '',
+                });
+              }}>
                 Cancel
               </Button>
             </div>
