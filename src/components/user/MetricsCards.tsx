@@ -24,19 +24,34 @@ export function MetricsCards({ userId, showResourceSpeaker }: MetricsCardsProps)
   const loadMetrics = async () => {
     setLoading(true);
 
-    // Calculate years of experience
+    // Calculate years of experience by summing actual employment periods
     const { data: workExp } = await supabase
       .from('work_experience')
-      .select('from_date')
+      .select('from_date, to_date, is_present')
       .eq('user_id', userId)
-      .order('from_date', { ascending: true })
-      .limit(1);
+      .order('from_date', { ascending: true });
 
     let yearsOfExperience = 0;
     if (workExp && workExp.length > 0) {
-      const earliestDate = new Date(workExp[0].from_date);
-      const today = new Date();
-      yearsOfExperience = Math.floor((today.getTime() - earliestDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25));
+      // Convert work experiences to time periods
+      const periods = workExp.map(exp => ({
+        start: new Date(exp.from_date).getTime(),
+        end: exp.is_present ? new Date().getTime() : new Date(exp.to_date || new Date()).getTime()
+      })).sort((a, b) => a.start - b.start);
+
+      // Merge overlapping periods
+      const merged: Array<{ start: number; end: number }> = [];
+      for (const period of periods) {
+        if (merged.length === 0 || merged[merged.length - 1].end < period.start) {
+          merged.push(period);
+        } else {
+          merged[merged.length - 1].end = Math.max(merged[merged.length - 1].end, period.end);
+        }
+      }
+
+      // Sum total time
+      const totalMs = merged.reduce((sum, period) => sum + (period.end - period.start), 0);
+      yearsOfExperience = Math.floor(totalMs / (1000 * 60 * 60 * 24 * 365.25) * 10) / 10; // Round to 1 decimal
     }
 
     // Calculate training hours attended
