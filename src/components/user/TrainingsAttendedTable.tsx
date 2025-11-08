@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { Download, Upload, Plus, Trash2, CheckCircle2, XCircle } from "lucide-react";
+import { Download, Upload, Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
@@ -24,7 +24,6 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [verifyingId, setVerifyingId] = useState<string | null>(null);
-  const [verificationResults, setVerificationResults] = useState<Record<string, any>>({});
   const [userProfile, setUserProfile] = useState<any>(null);
   const [formData, setFormData] = useState({
     training_name: '',
@@ -163,13 +162,19 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
 
       if (error) throw error;
 
-      setVerificationResults({
-        ...verificationResults,
-        [training.id]: data,
-      });
-
       if (data.success) {
-        toast.success('Certificate verified successfully!');
+        // Save verification status to database
+        const { error: updateError } = await supabase
+          .from('user_trainings_attended')
+          .update({ verified: true })
+          .eq('id', training.id);
+
+        if (updateError) {
+          toast.error('Failed to save verification status');
+        } else {
+          toast.success('Certificate verified successfully!');
+          loadTrainings();
+        }
       } else {
         toast.error('Certificate not found in database');
       }
@@ -249,18 +254,11 @@ export function TrainingsAttendedTable({ userId }: TrainingsAttendedTableProps) 
                 )}
               </TableCell>
               <TableCell>
-                {verificationResults[training.id] ? (
-                  verificationResults[training.id].success ? (
-                    <Badge variant="default" className="gap-1">
-                      <CheckCircle2 className="h-3 w-3" />
-                      Verified
-                    </Badge>
-                  ) : (
-                    <Badge variant="destructive" className="gap-1">
-                      <XCircle className="h-3 w-3" />
-                      Not Found
-                    </Badge>
-                  )
+                {training.verified ? (
+                  <Badge variant="default" className="gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Verified
+                  </Badge>
                 ) : (
                   <Button
                     variant="outline"

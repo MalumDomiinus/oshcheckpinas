@@ -184,6 +184,7 @@ export type Database = {
           updated_at: string
           user_id: string
           venue: string
+          verified: boolean
         }
         Insert: {
           certificate_number?: string | null
@@ -197,6 +198,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           venue: string
+          verified?: boolean
         }
         Update: {
           certificate_number?: string | null
@@ -210,6 +212,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           venue?: string
+          verified?: boolean
         }
         Relationships: []
       }
