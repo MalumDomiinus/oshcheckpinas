@@ -8,7 +8,7 @@ const About = () => {
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">About CertifyCheck</h1>
+            <h1 className="text-4xl font-bold mb-4">About OSHCheckPinas</h1>
             <p className="text-lg text-muted-foreground">
               Your trusted partner in OSH certificate verification and management
             </p>
@@ -67,7 +67,7 @@ const About = () => {
             <h2 className="text-2xl font-semibold mb-4">About OSH</h2>
             <p className="text-muted-foreground mb-4">
               Occupational Safety and Health (OSH) training is essential for maintaining 
-              safe workplaces and protecting workers from hazards. CertifyCheck ensures 
+              safe workplaces and protecting workers from hazards. OSHCheckPinas ensures 
               that all OSH certifications in our system meet the standards set by 
               regulatory bodies.
             </p>
