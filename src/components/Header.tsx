@@ -48,7 +48,7 @@ export const Header = () => {
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
             <Shield className="h-6 w-6 text-accent" />
-            <span>CertifyCheck</span>
+            <span>OSHCheckPinas</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">
